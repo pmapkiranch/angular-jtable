@@ -21,7 +21,11 @@ This repo is alternate solution for most popular jtable which is javascript base
 app.controller("jtableTestController", function ($rootScope, $scope, $http, $timeout, $state, $uibModal) {
 
     if (!$scope.items)
-        $scope.items = [];
+        $scope.items =  [{ Id: 3, Name: "UK2", Percentage: "71" },
+        {
+            Id: 4, Name: "UK3", Percentage: "71",
+            items: [{ Id: 1, Name: 'Hello1', Percentage: 1 }, { Id: 2, Name: 'Hello2', Percentage: 2 }, ]
+        }];
 
 $scope.JtableOptions = getJtableColumns();
 
@@ -31,7 +35,7 @@ $scope.JtableOptions = getJtableColumns();
             controller: 'jtableTestController',//This is to resolve controller methods that you used in Display,OnEdit functions
             title: 'Jtable test',
             paging: true, //Enable paging
-            pageSize: 2, //Set page size (default: 10)
+            pageSize: 2, //Set page size (default: 2)
             sorting: true, //Enable sorting
             defaultSorting: 'Name ASC',
             actions: {
@@ -66,6 +70,12 @@ $scope.JtableOptions = getJtableColumns();
                       
                     }
                 },
+                //If you have children you can pass like this. But make sure you pass data like this for $scope.items
+                 { Id: 3, Name: "UK2", Percentage: "71" },
+        {
+            Id: 4, Name: "UK3", Percentage: "71",
+            items: [{ Id: 1, Name: 'Hello1', Percentage: 1 }, { Id: 2, Name: 'Hello2', Percentage: 2 }, ]
+        }
                 children: getChildJtableColumns(),
 
             },
