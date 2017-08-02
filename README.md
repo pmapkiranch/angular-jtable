@@ -19,9 +19,13 @@ This repo is alternate solution for most popular jtable which is javascript base
 ### In your controller:
 ```js
 app.controller("jtableTestController", function ($rootScope, $scope, $http, $timeout, $state, $uibModal) {
+ $scope.vm = {};
+    var vm = $scope.vm;
+    vm.addItemClick=function(parentItem){
+    //TODO open popup
+    }
 
-    if (!$scope.items)
-        $scope.items =  [{ Id: 3, Name: "UK2", Percentage: "71" },
+           $scope.items =  [{ Id: 3, Name: "UK2", Percentage: "71" },
         {
             Id: 4, Name: "UK3", Percentage: "71",
             items: [{ Id: 1, Name: 'Hello1', Percentage: 1 }, { Id: 2, Name: 'Hello2', Percentage: 2 }, ]
@@ -43,7 +47,7 @@ $scope.JtableOptions = getJtableColumns();
                     alert('i am on main edit')
                 },
                 addAction: function (parentItem) {
-                    vm.addItem();
+                    vm.addItemClick(parentItem);
                 },
                 deleteAction: function (item) {
                     vm.deleteItem(item);
