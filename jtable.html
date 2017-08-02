@@ -2,7 +2,22 @@
     <div class="col-md-12">
         <div class="jtable-main-container">
 
-            <div ng-include="'home/GetView?viewName=../Angular/../Shared/JTable/_Header'"></div>
+            <div class="jtable-main-container">
+    <div class="jtable-title">
+        <div class="jtable-title-text">{{options.title}}</div>
+        <div class="jtable-toolbar">
+            <div ng-if="options.actions.addAction!=null" ng-click="addItem(options.actions.addAction,parentItem)">
+                <button id="btnAddCountryOfProduction" style="display:none" />
+                <span id="spnAddCountryOfProduction" class="jtable-toolbar-item jtable-toolbar-item-add-record">
+                    <span class="jtable-toolbar-item-icon"></span>
+                    <span class="jtable-toolbar-item-text">Add new record</span>
+                </span>
+            </div>
+        </div>
+    </div>
+
+
+</div>
 
 
             <table class="jtable angularJtable" style="width:100%;margin-bottom:0px;"
@@ -91,7 +106,54 @@
             </table>
             <div ng-if="filteredItems && filteredItems.length>0"
                  class="jtable-bottom-panel"
-                 ng-include="'home/GetView?viewName=../Angular/../Shared/JTable/_Footer'">
+                 >
+    <div class="jtable-left-area">
+
+        <!-- pager -->
+
+        <span class="jtable-page-list" ng-if="pager.pages.length">
+            <span class="jtable-page-number-first radioLabel"
+                  ng-click="setPage(1)"
+                  ng-class="{ 'jtable-page-number-disabled' : pager.currentPage == 1 }">&lt;&lt;</span>
+            <span class="jtable-page-number-previous radioLabel"
+                  ng-click="setPage(pager.currentPage - 1)"
+                  ng-class="{ 'jtable-page-number-disabled' : pager.currentPage == 1 }">&lt;</span>
+            <span ng-repeat="page in pager.pages"
+                  ng-click="setPage(page)"
+                  ng-class="{ 'jtable-page-number-active' : pager.currentPage == page, 'jtable-page-number-disabled' : page == '...' }"
+                  class="jtable-page-number radioLabel">{{ page }}</span>
+            <span class="jtable-page-number-next radioLabel"
+                  ng-click="setPage(pager.currentPage + 1)"
+                  ng-class="{ 'jtable-page-number-disabled' : pager.currentPage == pager.totalPages }">&gt;</span>
+            <span class="jtable-page-number-last radioLabel"
+                  ng-click="setPage(pager.endPage)"
+                  ng-class="{ 'jtable-page-number-disabled' : pager.currentPage == pager.totalPages }">&gt;&gt;</span>
+        </span>
+
+
+        <span class="jtable-goto-page">
+            <span>Go to page: </span>
+            <select ng-init="options.gotopage=1" ng-model="options.gotopage"
+                    ng-options="v for v in [] | range:(pager.totalPages)"
+                    ng-change="setPage(options.gotopage)"></select>
+        </span>
+        <span class="jtable-page-size-change">
+            <span>Row count: </span>
+
+            <select ng-model="options.pageSize"
+                    ng-options="v for v in [5,10,15,25,50,100,250,500]"
+                    ng-change="setPage(1)"></select>
+
+
+
+        </span>
+    </div>
+    <div class="jtable-right-area">
+        <span class="jtable-page-info">
+            Showing
+            {{((pager.currentPage - 1) * options.pageSize)+1}} to     {{(pager.currentPage - 1) * options.pageSize + filteredItems.length}} of {{items.length}}
+        </span>
+    </div>
 
             </div>
 
