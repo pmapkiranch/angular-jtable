@@ -2,20 +2,22 @@
 This repo is alternate solution for most popular jtable which is javascript based table which has in built sorting,paging,editing etc. But angular users were bit disappointed so I've started this project to mimic jtable. It looks exactly like jTable but it's angular table.
 
 ### Prerequisites
-bootsrap
-fontawesome
-jtable css (https://github.com/hikalkan/jtable/tree/master/lib/themes/lightcolor)
+- bootsrap
 
-Usage
+- fontawesome
+
+- jtable css (https://github.com/hikalkan/jtable/tree/master/lib/themes/lightcolor)
+
+# Usage
 
 ### In html:
-```javascript
+``` html
 
 <jtable items="items" options="JtableOptions"></jtable>
 ```
 
 ### In your controller:
-```javascript
+```js
 app.controller("jtableTestController", function ($rootScope, $scope, $http, $timeout, $state, $uibModal) {
 
     if (!$scope.items)
