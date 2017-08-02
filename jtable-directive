@@ -1,0 +1,225 @@
+app.directive('jtable', function () {
+    return {
+        restrict: 'E',
+        scope: {
+            items: '=',
+            options: '=',
+            lookupdata: '=?',
+            parentItem: '=?'
+        },
+        controller: function ($scope) {
+        
+         var PagerService = getPagerService();
+    $scope.pager = {};
+
+    var defaults = { pageSize: 2 };
+
+
+
+    $scope.expandAll = function (items) {
+        angular.forEach(items, function (row, index) {
+            row.isExpanded = true;
+            if (row.items && row.items.length > 0)
+                $scope.expandAll(row.items);
+        });
+
+    }
+    $scope.collapseAll = function (items) {
+        angular.forEach(items, function (row, index) {
+            row.isExpanded = false;
+            if (row.items && row.items.length > 0)
+                $scope.collapseAll(row.items);
+        });
+
+    }
+
+    $scope.$watchCollection('items', function (newNames, oldNames) {
+        $scope.setPage($scope.pager.currentPage);
+    });
+   
+
+    initController();
+  
+    function initController() {
+
+        if (!$scope.options.pageSize)
+            $scope.options.pageSize = defaults.pageSize;
+
+        if ($scope.options.pageSize && $scope.options.pageSize < defaults.pageSize)
+            $scope.options.pageSize = defaults.pageSize;
+
+       
+        $scope.setPage = setPage;
+
+        $scope.items = Utils.getPagingArray($scope.items);
+        // initialize to page 1
+        $scope.setPage(1);
+    }
+    function getPagerService() {
+        // service definition
+        var service = {};
+
+        service.GetPager = GetPager;
+
+        return service;
+
+        // service implementation
+        function GetPager(totalItems, currentPage, pageSize) {
+            // default to first page
+            currentPage = currentPage || 1;
+
+            // default page size is 10
+            pageSize = pageSize || 10;
+
+            // calculate total pages
+            var totalPages = Math.ceil(totalItems / pageSize);
+
+            var startPage, endPage;
+            if (totalPages <= 10) {
+                // less than 10 total pages so show all
+                startPage = 1;
+                endPage = totalPages;
+            } else {
+                // more than 10 total pages so calculate start and end pages
+                if (currentPage <= 6) {
+                    startPage = 1;
+                    endPage = 10;
+                } else if (currentPage + 4 >= totalPages) {
+                    startPage = totalPages - 9;
+                    endPage = totalPages;
+                } else {
+                    startPage = currentPage - 5;
+                    endPage = currentPage + 4;
+                }
+            }
+
+            // calculate start and end item indexes
+            var startIndex = (currentPage - 1) * pageSize;
+            var endIndex = Math.min(startIndex + pageSize - 1, totalItems - 1);
+
+            // create an array of pages to ng-repeat in the pager control
+            var pages = _.range(startPage, endPage + 1);
+
+            // return object with all pager properties required by the view
+            return {
+                totalItems: totalItems,
+                currentPage: currentPage,
+                pageSize: pageSize,
+                totalPages: totalPages,
+                startPage: startPage,
+                endPage: endPage,
+                startIndex: startIndex,
+                endIndex: endIndex,
+                pages: pages
+            };
+        }
+    }
+
+
+   
+
+
+    function setPage(page) {
+        if ($scope.items==null || $scope.items.length<=0 || page < 1 || page > $scope.pager.totalPages) {
+            return;
+        }
+
+        // get pager object from service
+        $scope.pager = PagerService.GetPager($scope.items.length, page, $scope.options.pageSize);
+
+        // get current page of items
+        
+        $scope.filteredItems = $scope.items.slice($scope.pager.startIndex, $scope.pager.endIndex + 1);
+        $scope.collapseAll($scope.filteredItems);
+    }
+
+
+   
+
+    if (!$scope.options.fields) {
+        toastr.error('fields not supplied')
+    }
+  
+
+    $scope.getNofPages = function (items, pageSize) {
+        if (!items)
+            return 1;
+
+        var result = Math.round(items.length / pageSize);
+        return result <= 0 ? 1 : result;
+    }
+
+
+    $scope.editItem = function (editAction, item) {
+
+        if (typeof editAction === "function") {
+            editAction(item);
+        }
+
+
+    }
+
+
+    $scope.deleteItem = function (deleteAction, item) {
+
+        if (typeof deleteAction === "function")
+            deleteAction(item);
+
+
+    }
+    $scope.addItem = function (addAction,item) {
+
+        if (typeof addAction === "function")
+            addAction(item);
+
+    }
+
+    $scope.sortData = function (header) {
+        header.isASC = !header.isASC;
+        header.isDESC = !header.isASC;
+        if (!$scope.options.sorting)
+            return;
+
+        var columnName = header.title;
+        if (header.isASC) {
+
+            $scope.filteredItems = Enumerable.From($scope.filteredItems).OrderBy(function (x) { return x[columnName] }).ToArray();
+        }
+        else {
+
+
+            $scope.filteredItems = Enumerable.From($scope.filteredItems).OrderByDescending(function (x) { return x[columnName] }).ToArray();
+
+        }
+
+    }
+
+    $scope.getPreviousRowCount = function () {
+        return ($scope.pager.currentPage - 1) * $scope.options.pageSize;
+    }
+    $scope.options.columns = Object.getOwnPropertyNames($scope.options.fields);
+
+    $scope.getAllColumnCount = function () {
+        var count = $scope.options.columns.length;
+        if ($scope.options.actions.deleteAction)
+            count++;
+
+        if ($scope.options.actions.editAction)
+            count++;
+        return count + 1;
+    }
+
+   
+
+    //console.log("jtable options passed :");
+    //console.log($scope.options);
+        }
+        link: function (scope, element, attrs, controllers) {
+
+        }
+
+        ,
+
+        templateUrl: 'jtable.html',
+    };
+});
