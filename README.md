@@ -9,7 +9,12 @@ This repo is alternate solution for most popular jtable which is javascript base
 - jtable css (https://github.com/hikalkan/jtable/tree/master/lib/themes/lightcolor)
 
 # Usage
-
+### In your directive folder
+  - copy jtable-directive.js file
+  - copy jtable-template.html file
+  - Load jtable-directive.js into your index.html file or whereever you load all scripts.
+  -  ``` For example <script src='\jtable-directive.js'></script>```
+  
 ### In html:
 ``` html
 
@@ -74,13 +79,7 @@ $scope.JtableOptions = getJtableColumns();
                       
                     }
                 },
-                //If you have children you can pass like this. But make sure you pass data like this for $scope.items
-                 { Id: 3, Name: "UK2", Percentage: "71" },
-        {
-            Id: 4, Name: "UK3", Percentage: "71",
-            items: [{ Id: 1, Name: 'Hello1', Percentage: 1 }, { Id: 2, Name: 'Hello2', Percentage: 2 }, ]
-        }
-                children: getChildJtableColumns(),
+               children: getChildJtableColumns(),
 
             },
 
