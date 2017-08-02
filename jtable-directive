@@ -220,6 +220,6 @@ app.directive('jtable', function () {
 
         ,
 
-        templateUrl: 'jtable.html',
+        templateUrl: 'jtable-template.html',
     };
 });
