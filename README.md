@@ -1,5 +1,5 @@
 # angular-jtable
-This repo is alternate solution for most popular jtable which is javascript based table which has in built sorting,paging,editing etc. But angular users were bit disappointed so I've started this project to mimic jtable. It looks exactly like jTable but it's angular table.
+This repo is alternate solution for most popular jtable which is javascript based table which has in built sorting,paging,editing etc. But angular users were bit disappointed so I've started this project to mimic jtable. It looks exactly like jTable but it's angular table. Please see the plunker for implementation http://plnkr.co/edit/D7oics3tl2i3elowaALu?p=preview
 
 ### Prerequisites
 - bootsrap
@@ -8,13 +8,10 @@ This repo is alternate solution for most popular jtable which is javascript base
 
 - jtable css (https://github.com/hikalkan/jtable/tree/master/lib/themes/lightcolor)
 
+- underscore (https://cdn.jsdelivr.net/underscorejs/1.8.3/underscore.js)
+
 # Usage
-### In your directive folder
-  - copy jtable-directive.js file
-  - copy jtable-template.html file
-  - Load jtable-directive.js into your index.html file or whereever you load all scripts.
-  -  ``` For example <script src='\jtable-directive.js'></script>```
-  
+
 ### In html:
 ``` html
 
@@ -23,70 +20,87 @@ This repo is alternate solution for most popular jtable which is javascript base
 
 ### In your controller:
 ```js
-app.controller("jtableTestController", function ($rootScope, $scope, $http, $timeout, $state, $uibModal) {
- $scope.vm = {};
-    var vm = $scope.vm;
-    vm.addItemClick=function(parentItem){
-    //TODO open popup
-    }
-
-           $scope.items =  [{ Id: 3, Name: "UK2", Percentage: "71" },
-        {
-            Id: 4, Name: "UK3", Percentage: "71",
-            items: [{ Id: 1, Name: 'Hello1', Percentage: 1 }, { Id: 2, Name: 'Hello2', Percentage: 2 }, ]
-        }];
-
-$scope.JtableOptions = getJtableColumns();
+// Code goes here
 
 
- function getJtableColumns() {
-        var columns = {
-            controller: 'jtableTestController',//This is to resolve controller methods that you used in Display,OnEdit functions
-            title: 'Jtable test',
-            paging: true, //Enable paging
-            pageSize: 2, //Set page size (default: 2)
-            sorting: true, //Enable sorting
-            defaultSorting: 'Name ASC',
-            actions: {
-                editAction: function () {
-                    alert('i am on main edit')
-                },
-                addAction: function (parentItem) {
-                    vm.addItemClick(parentItem);
-                },
-                deleteAction: function (item) {
-                    vm.deleteItem(item);
-                }
-            },
-            fields: {
+    var app = angular.module('myApp', ["angularjtable"]);
+    
+app.controller("jtableTestController", function($scope) {
+  $scope.vm = {};
+  var vm = $scope.vm;
+  vm.message = "angular working";
+
+  $scope.items = [{
+    Id: 3,
+    Name: "UK2",
+    Percentage: "71"
+  }, {
+    Id: 4,
+    Name: "UK3",
+    Percentage: "71",
+    items: [{
+      Id: 1,
+      Name: 'Hello1',
+      Percentage: 1
+    }, {
+      Id: 2,
+      Name: 'Hello2',
+      Percentage: 2
+    }, ]
+  }];
+
+  $scope.JtableOptions = getJtableColumns();
 
 
-                Name: {
-                    title: 'Country of Production',
-                    width: '70%'
-                },
+  function getJtableColumns() {
+    var columns = {
+      
+      title: 'Jtable test',
+      paging: true, //Enable paging
+      pageSize: 2, //Set page size (default: 2)
+      sorting: true, //Enable sorting
+      defaultSorting: 'Name ASC',
+      filter:true,
+      selecting:true,
+      actions: {
+        editAction: function() {
+          alert('i am on main edit');
+        },
+        addAction: function(parentItem) {
+          alert('add clicked');
+        },
+        deleteAction: function(item) {
+          alert('delete clicked');
+        }
+      },
+      fields: {
 
-                Percentage: {
-                    width: '20%',
-                    title: 'Percentage',
-                    OnEdit: function (data) {
-                       var edit = "<input numbersOnly class='jtableTextbox numbersOnly'  type='text' ng-model='item.Percentage' />"
 
-                       return edit;
-                   }
-                   ,
-                    display: function (data) {
-                      
-                    }
-                },
-               children: getChildJtableColumns(),
+        Name: {
+          title: 'Country of Production',
+          width: '70%'
+        },
 
-            },
+        Percentage: {
+          width: '20%',
+          title: 'Percentage(double click me)',
+          OnEdit: function(data) {
+            var edit = "<input  type='text' ng-model='item.Percentage' />";
 
-        };
+            return edit;
+          },
+          display: function(data) {
 
-        return columns;
-    }
+          }
+        },
+
+
+      },
+
+    };
+
+    return columns;
+  }
 
 });
 ```
