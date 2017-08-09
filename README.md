@@ -1,5 +1,7 @@
 # angular-jtable
-This repo is alternate solution for most popular jtable which is javascript based table which has in built sorting,paging,editing etc. But angular users were bit disappointed so I've started this project to mimic jtable. It looks exactly like jTable but it's angular table. Please see the plunker for implementation http://plnkr.co/edit/D7oics3tl2i3elowaALu?p=preview
+This repo is alternate solution for most popular jtable which is javascript based table which has in built sorting,paging,editing etc. But angular users were bit disappointed so I've started this project to mimic jtable. It looks exactly like jTable but it's angular table. 
+
+- For demo please see the plunker for implementation http://plnkr.co/edit/D7oics3tl2i3elowaALu?p=preview
 
 ### Prerequisites
 - bootsrap
