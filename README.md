@@ -17,7 +17,7 @@ This repo is alternate solution for most popular jtable which is javascript base
 ### In html:
 ``` html
 
-<jtable items="items" options="JtableOptions"></jtable>
+<jtable items="items" options="JtableOptions" vm="vm" selecteditems="vm.selectedrows"></jtable>
 ```
 
 ### In your controller:
@@ -33,6 +33,7 @@ This repo is alternate solution for most popular jtable which is javascript base
 app.controller("jtableTestController", function($scope) {
   $scope.vm = {};
   var vm = $scope.vm;
+  vm.selectedrows=[];
   vm.message = "angular jtable demo working";
 
   $scope.items = [{
