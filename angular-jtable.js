@@ -83,7 +83,7 @@ angularjtable.directive('dynamic', function ($compile) {
         restrict: 'A',
         replace: true,
         link: function (scope, ele, attrs) {
-            if (attrs.dynamic != "") {
+            if (attrs.dynamic !== "") {
                 var template = $compile(attrs.dynamic)(scope);
                 ele.replaceWith(template);
             }
@@ -103,7 +103,7 @@ angularjtable.directive('dynamic', function ($compile) {
             parentItem: '=?',
             vm: '=?'
         },
-        controller: function($scope,$filter){
+        controller: function($scope,$filter, orderByFilter){
           
           if (!$scope.options) {
         console.warn('angular jtable options not passed');
@@ -211,7 +211,7 @@ angularjtable.directive('dynamic', function ($compile) {
 
         var result = Math.round(items.length / pageSize);
         return result <= 0 ? 1 : result;
-    }
+    };
 
 
     $scope.editItem = function (editAction, item) {
@@ -221,8 +221,7 @@ angularjtable.directive('dynamic', function ($compile) {
         }
 
 
-    }
-
+    };
 
     $scope.deleteItem = function (deleteAction, item) {
 
@@ -230,37 +229,32 @@ angularjtable.directive('dynamic', function ($compile) {
             deleteAction(item);
 
 
-    }
+    };
     $scope.addItem = function (addAction, item) {
 
         if (typeof addAction === "function")
             addAction(item);
 
-    }
+    };
 
     $scope.sortData = function (header) {
-        header.isASC = !header.isASC;
+         header.isASC = !header.isASC;
         header.isDESC = !header.isASC;
         if (!$scope.options.sorting)
             return;
 
-        var columnName = header.title;
-        if (header.isASC) {
+        var propertyName = header.$key;
 
-            $scope.filteredItems = Enumerable.From($scope.filteredItems).OrderBy(function (x) { return x[columnName] }).ToArray();
-        }
-        else {
+        $scope.reverse = (propertyName !== null && $scope.propertyName === propertyName)
+        ? !$scope.reverse : false;
+        $scope.propertyName = propertyName;
+        $scope.items = orderByFilter($scope.items, $scope.propertyName, $scope.reverse);
 
-
-            $scope.filteredItems = Enumerable.From($scope.filteredItems).OrderByDescending(function (x) { return x[columnName] }).ToArray();
-
-        }
-
-    }
+    };
 
     $scope.getPreviousRowCount = function () {
         return ($scope.pager.currentPage - 1) * $scope.options.pageSize;
-    }
+    };
     $scope.options.columns = Object.getOwnPropertyNames($scope.options.fields);
 
     $scope.getAllColumnCount = function () {
@@ -271,7 +265,7 @@ angularjtable.directive('dynamic', function ($compile) {
         if ($scope.options.actions && $scope.options.actions.editAction)
             count++;
         return count + 1;
-    }
+    };
     //#endregion
 
     //#region private functions
