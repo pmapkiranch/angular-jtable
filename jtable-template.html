@@ -1,215 +1,172 @@
-
-
 <div class="row">
-    <div class="col-md-12">
-        <div class="jtable-main-container">
-            <!-- Header Start -->
-            <div class="jtable-title">
-                <div class="jtable-title-text">
-                    <div class="row" ng-if="options.filter">
-                        <div  class="col-md-1 handCursor" ng-init="model.showfilterDefaul=true"  
-                             ng-click="model.showfilterDefault=!model.showfilterDefault"
-                             style="max-width:4%;padding-right: 0px;margin-right: 0px;font-size: 1.5em;"
-                             title="show/hide filter">
-                            <i class="fa fa-filter" ></i>
+  <div class="col-md-12">
+    <div class="jtable-main-container">
+      <!-- Header Start -->
+      <div class="jtable-title">
+        <div class="jtable-title-text">
+          <div class="row" ng-if="options.filter">
+            <div class="col-md-1 handCursor" ng-init="model.showfilterDefaul=true" ng-click="model.showfilterDefault=!model.showfilterDefault" style="padding-right: 0px;margin-right: 0px;font-size: 1.5em;" title="show/hide filter">
+              <i class="fa fa-filter"></i>
 
-                        </div>
-                        <div class="col-md-11" style="padding-left:1px;">
-                            {{options.title}}
-                        </div>
-                    </div>
-                    <div ng-if="!options.filter">
-                        {{options.title}}
-                    </div>
+            </div>
+            <div class="col-md-11" style="padding-left:1px;">
+              {{options.title}}
+            </div>
+          </div>
+          <div ng-if="!options.filter">
+            {{options.title}}
+          </div>
 
-                </div>
+        </div>
 
-                <div class="jtable-toolbar">
+        <div class="jtable-toolbar">
 
-                    <div ng-if="options.actions.addAction!=null" ng-click="addItem(options.actions.addAction,parentItem)">
-                        <button id="btnAddCountryOfProduction" style="display:none" />
-                        <span id="spnAddCountryOfProduction" class="jtable-toolbar-item jtable-toolbar-item-add-record">
+          <div ng-if="options.actions.addAction!=null" ng-click="addItem(options.actions.addAction,parentItem)">
+            <button id="btnAddCountryOfProduction" style="display:none"></button>
+            <span id="spnAddCountryOfProduction" class="jtable-toolbar-item jtable-toolbar-item-add-record">
                             <span class="jtable-toolbar-item-icon"></span>
-                            <span class="jtable-toolbar-item-text">Add new record</span>
-                        </span>
-                    </div>
+            <span class="jtable-toolbar-item-text">Add new record</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div ng-show="model.showfilterDefault" style="margin:3px;">
+        <input ng-init="model={};" esc-key="model.filter=''" class="filter form-control filter-unselected" ng-model="model.filter" type="text" placeholder="Filter" clearable ng-change="filterTable()">
+      </div>
+      <!-- Header End -->
+      <!-- Body Start -->
+      <table class="jtable angularJtable" style="width:100%;margin-bottom:0px;" resizeable id="angularTable{{$index}}">
+        <thead>
+
+          <tr>
+
+            <th ng-if="filteredItems.length> 0 && options.selecting" width="3%" style="text-align:center;" title="Select/De select All" class="handCursor">
+
+              <input type="checkbox" ng-model="model.IsAllSelected" ng-change="selectAll(filteredItems,model.IsAllSelected)" />
+            </th>
+
+            <th ng-if="filteredItems.length> 0 && options.children" width="3%" ng-click="IsAllExpanded=!IsAllExpanded;expandAll(filteredItems,IsAllExpanded)" style="text-align:center;" title="Expand/Collapse All" class="handCursor">
+              <i class="fa fa-expand" style="font-weight:bolder;font-size:1.2em;"></i>
+            </th>
+            <th class="jtable-column-header radioLabel" ng-class="{'jtable-column-header-sortable':options.sorting,'jtable-column-header-sorted-asc' :h.isASC,'jtable-column-header-sorted-desc':h.isDESC }" ng-repeat="h in options.fields | toArray " width="{{h.width}}"
+            ng-click="sortData(h)">
+              <div class="jtable-column-header-container">
+
+                <span class="jtable-column-header-text">{{h.title}}</span>
+              </div>
+            </th>
+
+
+            <th ng-if="options.actions.editAction!=null"></th>
+            <th ng-if="options.actions.deleteAction!=null"></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr ng-show="items==null || (items != null && items.length == 0)">
+            <td colspan="{{getAllColumnCount()}}" style="text-align:center">
+              No records found
+            </td>
+          </tr>
+          <tr class="jtable-data-row" ng-class-odd="'jtable-row-odd'" ng-class-even="'jtable-row-even'" ng-repeat-start="item in filteredItems" ng-class="{'jtableRowSelected':item.isSelected}">
+
+            <td ng-if="filteredItems.length> 0 &&  options.selecting" style="text-align:center" class="handCursor">
+              <input type="checkbox" ng-model="item.isSelected" ng-change="selectItem(item)" />
+            </td>
+
+
+            <td ng-if="filteredItems.length> 0 &&  options.children" ng-click="item.isExpanded = !item.isExpanded;" style="text-align:center" class="handCursor">
+              <i class="fa fa-expand"></i>
+            </td>
+            <td ng-repeat="c in options.columns" ng-dblclick="isEditMode=!isEditMode" ng-mouseleave="isEditMode=''">
+              <div ng-show="!isEditMode">
+                <div dynamic="{{options.fields[c].display({record:item})}}">
+                  {{item[c]}}
                 </div>
-            </div>
 
-            <div ng-show="model.showfilterDefault" style="margin:3px;">
-                <input ng-init="model={};" esc-key="model.filter=''"
-                       class="filter form-control filter-unselected" ng-model="model.filter"
-                       type="text" placeholder="Filter" clearable ng-change="filterTable()">
-            </div>
-            <!-- Header End -->
-            <!-- Body Start -->
-            <table class="jtable angularJtable" style="width:100%;margin-bottom:0px;"
-                    resizeable id="angularTable{{$index}}">
-                <thead>
+              </div>
+              <div ng-show="isEditMode">
+                <div dynamic="{{options.fields[c].OnEdit({record:item})}}">
+                  {{item[c]}}
+                </div>
+              </div>
+            </td>
+            <td ng-if="options.actions.editAction!=null">
+              <button title="Edit" ng-click="editItem(options.actions.editAction,item);" class="jtable-command-button jtable-edit-command-button">
+                <span>Edit</span>
+              </button>
+            </td>
+            <td ng-if="options.actions.deleteAction!=null">
+              <button title="Delete" ng-click="deleteItem(options.actions.deleteAction,item)" class="jtable-command-button jtable-delete-command-button">
+                <span>Delete</span>
+              </button>
+            </td>
 
-                    <tr>
-
-                        <th ng-if="filteredItems.length> 0 && options.selecting" width="3%"
-                            style="text-align:center;" title="Select/De select All" class="handCursor">
-                            
-                            <input type="checkbox" ng-model="model.IsAllSelected" 
-                                   ng-change="selectAll(filteredItems,model.IsAllSelected)" />
-                        </th>
-
-                        <th ng-if="filteredItems.length> 0 && options.children" width="3%"
-                            ng-click="IsAllExpanded=!IsAllExpanded;expandAll(filteredItems,IsAllExpanded)" 
-                            style="text-align:center;" title="Expand/Collapse All" class="handCursor">
-                            <i class="fa fa-expand" style="font-weight:bolder;font-size:1.2em;"></i>
-                        </th>
-                        <th class="jtable-column-header radioLabel"
-                            ng-class="{'jtable-column-header-sortable':options.sorting,'jtable-column-header-sorted-asc' :h.isASC,'jtable-column-header-sorted-desc':h.isDESC }"
-                            ng-repeat="h in options.fields | toArray " width="{{h.width}}" 
-                            ng-click="sortData(h)" 
-                            >
-                            <div  class="jtable-column-header-container">
-                               
-                                <span class="jtable-column-header-text">{{h.title}}</span>
-                            </div>
-                        </th>
-
-
-                        <th ng-if="options.actions.editAction!=null"></th>
-                        <th ng-if="options.actions.deleteAction!=null"></th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    <tr ng-show="items==null || (items != null && items.length == 0)">
-                        <td colspan="{{getAllColumnCount()}}" style="text-align:center">
-                            No records found
-                        </td>
-                    </tr>
-                    <tr class="jtable-data-row" ng-class-odd="'jtable-row-odd'"
-                        ng-class-even="'jtable-row-even'"
-                        ng-repeat-start="item in filteredItems" ng-class="{'jtableRowSelected':item.isSelected}">
-
-                        <td ng-if="filteredItems.length> 0 &&  options.selecting" 
-                            style="text-align:center" class="handCursor">
-                            <input type="checkbox" ng-model="item.isSelected" 
-                                   ng-change="selectItem(item)" />
-                        </td>
-
-
-                        <td ng-if="filteredItems.length> 0 &&  options.children" ng-click="item.isExpanded = !item.isExpanded;"
-                            style="text-align:center" class="handCursor">
-                            <i class="fa fa-expand"></i>
-                        </td>
-                        <td ng-repeat="c in options.columns"
-                            ng-dblclick="isEditMode=!isEditMode"
-                            ng-mouseleave="isEditMode=''">
-                            <div ng-show="!isEditMode">
-                                <div dynamic="{{options.fields[c].display({record:item})}}">
-                                    {{item[c]}}
-                                </div>
-
-                            </div>
-                            <div ng-show="isEditMode">
-                                <div dynamic="{{options.fields[c].OnEdit({record:item})}}">
-                                    {{item[c]}}
-                                </div>
-                            </div>
-                        </td>
-                        <td ng-if="options.actions.editAction!=null">
-                            <button title="Edit" ng-click="editItem(options.actions.editAction,item);"
-                                    class="jtable-command-button jtable-edit-command-button">
-                                <span>Delete</span>
-                            </button>
-                        </td>
-                        <td ng-if="options.actions.deleteAction!=null">
-                            <button title="Delete" ng-click="deleteItem(options.actions.deleteAction,item)"
-                                    class="jtable-command-button jtable-delete-command-button">
-                                <span>Delete</span>
-                            </button>
-                        </td>
-
-                    </tr>
+          </tr>
 
 
 
 
 
-                    <tr ng-repeat-end="" ng-if="options.children" ng-show="item.isExpanded">
-                        <td colspan="{{getAllColumnCount()}}">
-                            <div class="jtable-child-table-container" >
-                                <jtable items="item.items"
-                                        options="options.children" parent-item="item" vm="vm">
-                                </jtable>
-                            </div>
+          <tr ng-repeat-end="" ng-if="options.children" ng-show="item.isExpanded">
+            <td colspan="{{getAllColumnCount()}}">
+              <div class="jtable-child-table-container">
+                <jtable items="item.items" options="options.children" parent-item="item" vm="vm">
+                </jtable>
+              </div>
 
-                        </td>
-                    </tr>
-                </tbody>
+            </td>
+          </tr>
+        </tbody>
 
-            </table>
-            <!-- Body Start -->
+      </table>
+      <!-- Body Start -->
 
-            <div ng-if="filteredItems && filteredItems.length>0 && options.paging"
-                 class="jtable-bottom-panel">
+      <div ng-if="filteredItems && filteredItems.length>0 && options.paging" class="jtable-bottom-panel">
 
 
-                <!-- Footer Start -->
-                <div class="jtable-left-area">
+        <!-- Footer Start -->
+        <div class="jtable-left-area">
 
-                    <!-- pager -->
+          <!-- pager -->
 
-                    <span class="jtable-page-list" ng-if="pager.pages.length">
+          <span class="jtable-page-list" ng-if="pager.pages.length">
                         <span class="jtable-page-number-first radioLabel"
                               ng-click="pager.currentPage == 1 || setPage(1)"
                               ng-class="{ 'jtable-page-number-disabled' : pager.currentPage == 1}"
                               ng-dis>&lt;&lt;</span>
-                        <span class="jtable-page-number-previous radioLabel"
-                              ng-click="pager.currentPage == 1 || setPage(pager.currentPage - 1)"
-                              ng-class="{ 'jtable-page-number-disabled' : pager.currentPage == 1 }">&lt;</span>
-                        <span ng-repeat="page in pager.pages"
-                              ng-click="setPage(page)"
-                              ng-class="{ 'jtable-page-number-active' : pager.currentPage == page, 'jtable-page-number-disabled' : page == '...' }"
-                              class="jtable-page-number radioLabel">{{ page }}</span>
-                        <span class="jtable-page-number-next radioLabel"
-                              ng-click="pager.currentPage == pager.totalPages || setPage(pager.currentPage + 1)"
-                              ng-class="{ 'jtable-page-number-disabled' : pager.currentPage == pager.totalPages }">&gt;</span>
-                        <span class="jtable-page-number-last radioLabel"
-                              ng-click="pager.currentPage == pager.totalPages || setPage(pager.endPage)"
-                              ng-class="{ 'jtable-page-number-disabled' : pager.currentPage == pager.totalPages }">&gt;&gt;</span>
-                    </span>
+          <span class="jtable-page-number-previous radioLabel" ng-click="pager.currentPage == 1 || setPage(pager.currentPage - 1)" ng-class="{ 'jtable-page-number-disabled' : pager.currentPage == 1 }">&lt;</span>
+          <span ng-repeat="page in pager.pages" ng-click="setPage(page)" ng-class="{ 'jtable-page-number-active' : pager.currentPage == page, 'jtable-page-number-disabled' : page == '...' }" class="jtable-page-number radioLabel">{{ page }}</span>
+          <span class="jtable-page-number-next radioLabel" ng-click="pager.currentPage == pager.totalPages || setPage(pager.currentPage + 1)" ng-class="{ 'jtable-page-number-disabled' : pager.currentPage == pager.totalPages }">&gt;</span>
+          <span class="jtable-page-number-last radioLabel" ng-click="pager.currentPage == pager.totalPages || setPage(pager.endPage)" ng-class="{ 'jtable-page-number-disabled' : pager.currentPage == pager.totalPages }">&gt;&gt;</span>
+          </span>
 
 
-                    <span class="jtable-goto-page">
+          <span class="jtable-goto-page">
                         <span>Go to page: </span>
-                        <select ng-init="options.gotopage=1" ng-model="options.gotopage"
-                                ng-options="v for v in [] | range:(pager.totalPages)"
-                                ng-change="setPage(options.gotopage)"></select>
-                    </span>
-                    <span class="jtable-page-size-change">
+          <select ng-init="options.gotopage=1" ng-model="options.gotopage" ng-options="v for v in [] | range:(pager.totalPages)" ng-change="setPage(options.gotopage)"></select>
+          </span>
+          <span class="jtable-page-size-change">
                         <span>Row count: </span>
 
-                        <select ng-model="options.pageSize"
-                                ng-options="v for v in [5,10,15,25,50,100,250,500]"
-                                ng-change="setPage(1)"></select>
+          <select ng-model="options.pageSize" ng-options="v for v in [5,10,15,25,50,100,250,500]" ng-change="setPage(1)"></select>
 
 
 
-                    </span>
-                </div>
-                <div class="jtable-right-area">
-                    <span class="jtable-page-info">
+          </span>
+        </div>
+        <div class="jtable-right-area">
+          <span class="jtable-page-info">
                         Showing
                         {{((pager.currentPage - 1) * options.pageSize)+1}} to     {{(pager.currentPage - 1) * options.pageSize + filteredItems.length}} of {{items.length}}
                     </span>
-                </div>
-
-                <!-- Footer End -->
-
-            </div>
-
         </div>
+
+        <!-- Footer End -->
+
+      </div>
+
     </div>
+  </div>
 </div>
-
-
-
-
