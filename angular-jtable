@@ -1,164 +1,111 @@
-app.directive('jtable', function () {
+//directive begin
+
+    var angularjtable = angular.module('angularjtable', []);
+    
+    angularjtable.filter('toArray', function () {
+    return function (obj, addKey) {
+        if (!(obj instanceof Object)) {
+            return obj;
+        }
+
+        if (addKey === false) {
+            return Object.values(obj);
+        } else {
+            return Object.keys(obj).map(function (key) {
+                return Object.defineProperty(obj[key], '$key', { enumerable: false, value: key });
+            });
+        }
+    };
+});
+
+angularjtable.filter('range', function () {
+    return function (input, total) {
+        total = parseInt(total);
+
+        for (var i = 1; i <= total; i++) {
+            input.push(i);
+        }
+
+        return input;
+    };
+});
+
+
+angularjtable.directive('escKey', function () {
+    return function (scope, element, attrs) {
+        element.bind('keydown keypress', function (event) {
+            if (event.which === 27) { // 27 = esc key
+                scope.$apply(function () {
+                    scope.$eval(attrs.escKey);
+                });
+
+                event.preventDefault();
+            }
+        });
+    };
+})
+
+
+    angularjtable.directive('clearable', function ($compile, $timeout) {
+    return {
+        require: 'ngModel',
+        link: function (scope, elem, attrs, ctrl) {
+            elem.addClass('clearable');
+
+            elem.bind('input', function () {
+                elem[toggleClass(elem.val())]('x');
+            });
+
+            elem.on('mousemove', function (e) {
+                if (elem.hasClass('x')) {
+                    elem[toggleClass(this.offsetWidth - 25 < e.clientX - this.getBoundingClientRect().left)]('onX');
+                }
+            });
+
+            elem.on('click', function (e) {
+                if (elem.hasClass('onX')) {
+                    elem.removeClass('x onX').val(undefined);
+                    ctrl.$setViewValue(undefined);
+                    ctrl.$render();
+                    scope.$digest();
+                }
+            });
+
+            function toggleClass(v) {
+                return v ? 'addClass' : 'removeClass';
+            }
+        }
+    };
+});
+
+angularjtable.directive('dynamic', function ($compile) {
+    return {
+        restrict: 'A',
+        replace: true,
+        link: function (scope, ele, attrs) {
+            if (attrs.dynamic != "") {
+                var template = $compile(attrs.dynamic)(scope);
+                ele.replaceWith(template);
+            }
+
+
+        }
+    };
+});
+
+  angularjtable.directive('jtable', function () {
     return {
         restrict: 'E',
         scope: {
             items: '=',
+            selecteditems:'=?',
             options: '=',
-            lookupdata: '=?',
-            parentItem: '=?'
+            parentItem: '=?',
+            vm: '=?'
         },
-        controller: function ($scope) {
-        
-         var PagerService = getPagerService();
-    $scope.pager = {};
-
-    var defaults = { pageSize: 2 };
-
-
-
-    $scope.expandAll = function (items) {
-        angular.forEach(items, function (row, index) {
-            row.isExpanded = true;
-            if (row.items && row.items.length > 0)
-                $scope.expandAll(row.items);
-        });
-
-    }
-    $scope.collapseAll = function (items) {
-        angular.forEach(items, function (row, index) {
-            row.isExpanded = false;
-            if (row.items && row.items.length > 0)
-                $scope.collapseAll(row.items);
-        });
-
-    }
-
-    $scope.$watchCollection('items', function (newNames, oldNames) {
-        $scope.setPage($scope.pager.currentPage);
-    });
-   
-
-    initController();
-  
-    function initController() {
-
-        if (!$scope.options.pageSize)
-            $scope.options.pageSize = defaults.pageSize;
-
-        if ($scope.options.pageSize && $scope.options.pageSize < defaults.pageSize)
-            $scope.options.pageSize = defaults.pageSize;
-
-       
-        $scope.setPage = setPage;
-
-        $scope.items = Utils.getPagingArray($scope.items);
-        // initialize to page 1
-        $scope.setPage(1);
-    }
-    function getPagerService() {
-        // service definition
-        var service = {};
-
-        service.GetPager = GetPager;
-
-        return service;
-
-        // service implementation
-        function GetPager(totalItems, currentPage, pageSize) {
-            // default to first page
-            currentPage = currentPage || 1;
-
-            // default page size is 10
-            pageSize = pageSize || 10;
-
-            // calculate total pages
-            var totalPages = Math.ceil(totalItems / pageSize);
-
-            var startPage, endPage;
-            if (totalPages <= 10) {
-                // less than 10 total pages so show all
-                startPage = 1;
-                endPage = totalPages;
-            } else {
-                // more than 10 total pages so calculate start and end pages
-                if (currentPage <= 6) {
-                    startPage = 1;
-                    endPage = 10;
-                } else if (currentPage + 4 >= totalPages) {
-                    startPage = totalPages - 9;
-                    endPage = totalPages;
-                } else {
-                    startPage = currentPage - 5;
-                    endPage = currentPage + 4;
-                }
-            }
-
-            // calculate start and end item indexes
-            var startIndex = (currentPage - 1) * pageSize;
-            var endIndex = Math.min(startIndex + pageSize - 1, totalItems - 1);
-
-            // create an array of pages to ng-repeat in the pager control
-            var pages = _.range(startPage, endPage + 1);
-
-            // return object with all pager properties required by the view
-            return {
-                totalItems: totalItems,
-                currentPage: currentPage,
-                pageSize: pageSize,
-                totalPages: totalPages,
-                startPage: startPage,
-                endPage: endPage,
-                startIndex: startIndex,
-                endIndex: endIndex,
-                pages: pages
-            };
-        }
-    }
-
-
-   
-
-
-    function setPage(page) {
-        if ($scope.items==null || $scope.items.length<=0 || page < 1 || page > $scope.pager.totalPages) {
-            return;
-        }
-
-        // get pager object from service
-        $scope.pager = PagerService.GetPager($scope.items.length, page, $scope.options.pageSize);
-
-        // get current page of items
-        
-        $scope.filteredItems = $scope.items.slice($scope.pager.startIndex, $scope.pager.endIndex + 1);
-        $scope.collapseAll($scope.filteredItems);
-    }
-
-
-   
-
-    if (!$scope.options.fields) {
-        toastr.error('fields not supplied')
-    }
-  
-
-    $scope.getNofPages = function (items, pageSize) {
-        if (!items)
-            return 1;
-
-        var result = Math.round(items.length / pageSize);
-        return result <= 0 ? 1 : result;
-    }
-
-
-    $scope.editItem = function (editAction, item) {
-
-        if (typeof editAction === "function") {
-            editAction(item);
-        }
-
-
-    }
-  if (!$scope.options) {
+        controller: function($scope,$filter){
+          
+          if (!$scope.options) {
         console.warn('angular jtable options not passed');
         return;
     }
@@ -248,7 +195,7 @@ app.directive('jtable', function () {
 
 
     $scope.$watch('model.filter', function (newNames, oldNames) {
-        if ($scope.model.filter == "")
+        if ($scope.model.filter === "")
             $scope.filterTable();
     });
 
@@ -404,7 +351,7 @@ app.directive('jtable', function () {
             items = $scope.items;
 
 
-        if (items == null || items.length <= 0 || page < 1 || page > $scope.pager.totalPages) {
+        if (items === null || items.length <= 0 || page < 1 || page > $scope.pager.totalPages) {
             return;
         }
 
@@ -420,15 +367,17 @@ app.directive('jtable', function () {
         $scope.expandAll($scope.filteredItems, false);
     }
     //#endregion
-    //console.log("jtable options passed :");
-    //console.log($scope.options);
-        }
+    console.log("jtable options passed :");
+    console.log($scope.options);
+          
+        },
         link: function (scope, element, attrs, controllers) {
 
         }
 
         ,
 
-        templateUrl: 'jtable-template.html',
+        templateUrl:"angular-jtable-tpl.html",
     };
 });
+  
