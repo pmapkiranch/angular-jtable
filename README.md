@@ -178,6 +178,7 @@ vm.clicktoselect=function(item){
 
 ## Result
 
+![Alt text](https://github.com/pmapkiranch/angular-jtable/blob/master/angularjtable.PNG "Optional title")
 
 ## Authors
 
