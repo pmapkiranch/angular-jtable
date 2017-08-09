@@ -126,6 +126,9 @@ angularjtable.directive('dynamic', function ($compile) {
 
     if (!$scope.selecteditems)
         $scope.selecteditems = [];
+        
+         if (!$scope.model)
+        $scope.model = {};
 
     $scope.pager = {};
 
@@ -157,8 +160,8 @@ angularjtable.directive('dynamic', function ($compile) {
     //#region events
     $scope.filterTable = function () {
         $scope.filteredItems = $filter('filter')($scope.items, $scope.model.filter);
-        $scope.setPage($scope.pager.currentPage, $scope.filteredItems);
-    }
+        $scope.setPage(1, $scope.filteredItems);
+    };
 
     
     $scope.selectAll = function (items, flag) {
@@ -168,7 +171,7 @@ angularjtable.directive('dynamic', function ($compile) {
 
         });
 
-    }
+    };
     $scope.selectItem = function (item) {
 
         if (item.isSelected)
@@ -190,7 +193,7 @@ angularjtable.directive('dynamic', function ($compile) {
         });
 
         $scope.model.IsAllSelected = allSelected;
-    }
+    };
 
 
 
@@ -201,7 +204,7 @@ angularjtable.directive('dynamic', function ($compile) {
 
     $scope.$watchCollection('items', function (newcollection, oldcollection) {
         $scope.filteredItems = newcollection;
-        $scope.setPage($scope.pager.currentPage, $scope.filteredItems);
+        $scope.setPage(1, $scope.filteredItems);
     });
 
 
@@ -342,7 +345,7 @@ angularjtable.directive('dynamic', function ($compile) {
         }
 
         if (!items)
-            items = $scope.items;
+            items = $filter('filter')($scope.items, $scope.model.filter);
 
 
         if (items === null || items.length <= 0 || page < 1 || page > $scope.pager.totalPages) {
