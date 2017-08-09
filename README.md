@@ -23,38 +23,53 @@ This repo is alternate solution for most popular jtable which is javascript base
 // Code goes here
 
 
+   // Code goes here
+
+
     var app = angular.module('myApp', ["angularjtable"]);
     
 app.controller("jtableTestController", function($scope) {
   $scope.vm = {};
   var vm = $scope.vm;
-  vm.message = "angular working";
+  vm.message = "angular jtable demo working";
 
   $scope.items = [{
     Id: 3,
-    Name: "UK2",
-    Percentage: "71"
-  }, {
-    Id: 4,
-    Name: "UK3",
-    Percentage: "71",
-    items: [{
+    Name: "UK",
+    Percentage: "20",
+     items: [{
       Id: 1,
-      Name: 'Hello1',
-      Percentage: 1
+      Name: 'London',
+      Percentage: "10"
     }, {
       Id: 2,
-      Name: 'Hello2',
-      Percentage: 2
+      Name: 'Leeds',
+      Percentage: "10"
+    }, ]
+  }, {
+    Id: 4,
+    Name: "USA",
+    Percentage: "80",
+    items: [{
+      Id: 1,
+      Name: 'Texas',
+      Percentage: "40"
+    }, {
+      Id: 2,
+      Name: 'Chicago',
+      Percentage: "40"
     }, ]
   }];
 
   $scope.JtableOptions = getJtableColumns();
 
-
+vm.clicktoselect=function(item){
+  
+  item.isSelected=!item.isSelected;
+}
   function getJtableColumns() {
     var columns = {
-      
+      controller: 'jtableTestController', //This is to resolve controller methods that you used in Display,OnEdit functions
       title: 'Jtable test',
       paging: true, //Enable paging
       pageSize: 2, //Set page size (default: 2)
@@ -79,6 +94,12 @@ app.controller("jtableTestController", function($scope) {
         Name: {
           title: 'Country of Production',
           width: '70%'
+          ,
+          display: function(data) {
+ var html = "<div  ng-click=\"vm.clicktoselect(item)\">{{item.Name}}</div>";
+
+            return html;
+          }
         },
 
         Percentage: {
@@ -92,6 +113,52 @@ app.controller("jtableTestController", function($scope) {
           display: function(data) {
 
           }
+        },
+        children:getChildJtableColumns(),
+
+
+      },
+
+    };
+
+    return columns;
+  }
+  
+  
+  
+  
+   function getChildJtableColumns() {
+    var columns = {
+     
+      title: 'Jtable child test',
+      paging: true, //Enable paging
+      pageSize: 2, //Set page size (default: 2)
+      sorting: true, //Enable sorting
+      defaultSorting: 'Name ASC',
+      filter:true,
+      selecting:true,
+      actions: {
+        editAction: function() {
+          alert('i am on child edit');
+        },
+        addAction: function(parentItem) {
+          alert('child add clicked');
+        },
+        deleteAction: function(item) {
+          alert('child delete clicked');
+        }
+      },
+      fields: {
+
+
+        Name: {
+          title: 'State of Production',
+          width: '70%'
+        },
+
+        Percentage: {
+          width: '20%',
+          title: 'Percentage(double click me)',
         },
 
 
